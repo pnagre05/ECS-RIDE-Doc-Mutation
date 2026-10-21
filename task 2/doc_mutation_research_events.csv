@@ -1,0 +1,175 @@
+﻿event_id,commit_hash,method_key,old_javadoc,new_javadoc,old_code,new_code,pairing_correct,semantic_change,student_note
+,a1c12e6d4,org.apache.commons.lang3.StringUtils.abbreviate(...),"/** Javadoc: `StringUtils.abbreviate(""abcdefghijklmno"", ""…"", 6, 10) = ""…ghij…""`  */","/** `StringUtils.abbreviate(""abcdefghijklmno"", ""…"", 6, 10) = ""…ghijklmno` */",public static boolean isBlank(CharSequence cs) { ... },`public static boolean isBlank(CharSequence cs) { ... }` *(unchanged)*,yes,yes,Doc now corrected an incorrect abbreviate Javadoc example to show proper output for a single-character abbreviation marker
+,285cd2fc4,org.apache.commons.lang3.builder.AbstractReflection.setAccessibleTrue(AccessibleObject),"/** Javadoc: 
+Parameter documented as “may be null”, null is accounted for 
+ */","/** Parameter must be non-null, return can’t be non-null anymore*/","private static boolean setAccessibleTrue(final AccessibleObject accessibleObject) {
+    if (accessibleObject != null) {
+        // Test isAccessible() to avoid the permission check.
+        if (!accessibleObject.isAccessible()) {
+            accessibleObject.setAccessible(true);
+        }
+        return accessibleObject.isAccessible();
+    }
+    return false;
+}","private static boolean setAccessibleTrue(final AccessibleObject accessibleObject) {
+    // Test isAccessible() to avoid the permission check.
+    if (!accessibleObject.isAccessible()) {
+        accessibleObject.setAccessible(true);
+    }
+    return accessibleObject.isAccessible();
+}",yes,yes,"Updated the Javadoc to state that `accessibleObject` must be non-null, matching the method's removal of null handling."
+003,7e5906fb0,AbstractReflection.setAccessibleTrue,"/** Describes a `Field`; `field` may be null 
+ */",/** Describes an `AccessibleObject`; `accessibleObject` may be null */,setAccessibleTrue(final Field field),setAccessibleTrue(final AccessibleObject accessibleObject),no,yes,Updated the documentation and implementation to generalize the method from `Field` to `AccessibleObject`.
+,e8bafeb6a,"org.apache.commons.lang3.time.FastDateParser.parse(String, ParsePosition)","/** 
+ */",/** */,"private boolean checkLength(final String source, final ParsePosition pos) {
++        final int startIndex = pos.getIndex();
++        if (startIndex > source.length()) {
++            pos.setErrorIndex(startIndex);
++            return false;
++        }
++        return true;
++    }","-        final int startIndex = pos.getIndex();
+-        if (startIndex > source.length()) {
+-            pos.setErrorIndex(startIndex);
++        if (!checkLength(source, pos)) {
+             return null;
+         }
+
+
+
+
+     @Override
+     public boolean parse(final String source, final ParsePosition pos, final Calendar calendar) {
+-        final int startIndex = pos.getIndex();
+-        if (startIndex > source.length()) {
+-            pos.setErrorIndex(startIndex);
++        if (!checkLength(source, pos)) {
+             return false;
+         }
+         final ListIterator<StrategyAndWidth> lt = patterns.listIterator();",yes,no,Updated the documentation and implementation to generalize the method from `Field` to `AccessibleObject`.
+005,d5d17bd9c28590cf44469bc1898c263ecd4d05fd,"org.apache.bcel.classfile.LocalVariableTable.getLocalVariable(int,int)",/** Gets the local variable for the given index and program counter. @param index the variable slot. @param pc the current pc that this variable is alive. @return the LocalVariable that matches or null if not found. */,/** Gets the local variable for the given index and program counter. @param index the variable slot. @param pc the current pc that this variable is alive. @return the LocalVariable that matches or null if not found. */,"`public final LocalVariable getLocalVariable(final int index, final int pc) { for (final LocalVariable variable : localVariableTable) { if (variable.getIndex() == index) { final int startPc = variable.getStartPC(); final int endPc = startPc + variable.getLength(); if (pc >= startPc && pc <= endPc) { return variable; } } } return null; }`","`public final LocalVariable getLocalVariable(final int index, final int pc) { for (final LocalVariable variable : localVariableTable) { if (variable.getIndex() == index) { final int startPc = variable.getStartPC(); final int endPc = startPc + variable.getLength(); if (pc >= startPc && pc < endPc) { return variable; } } } return null; }`",yes,yes,"`Code behavior changed from an inclusive to an exclusive live-range end (<= to <), while the associated Javadoc remained unchanged.`"
+006,dbd621c2f7ac15feaea3b29e3336ecbb2dadebc3,org.apache.bcel.generic.CPInstruction.setIndex(int),/** Sets the index to constant pool. @param index in constant pool. */,`/** Sets the index to constant pool. @param index in constant pool. @throws ClassGenException if index is out of bounds. */`,"public void setIndex(final int index) { if (index < 0 || index > Const.MAX_SHORT) { throw new ClassGenException(""Illegal value: "" + index); } this.index = index; }","`public void setIndex(final int index) { if (index < 0 || index > Const.MAX_SHORT) { throw new ClassGenException(""Illegal index: "" + index); } this.index = index; }`",yes,yes,"Javadoc now explicitly documents that `ClassGenException` is thrown for an out-of-bounds index. Code retains the same bounds check but changes the exception message from `""Illegal value""` to `""Illegal index""`."
+007,68698bbd87096b9c6836e2cc13501b5d990a3516,org.apache.bcel.generic.IINC.setIncrement(int),/** Sets increment factor. @param c The increment factor. */,`/** Sets increment factor. @param c The increment factor. @throws ClassGenException if the increment is out of bounds. */`,public final void setIncrement(final int c) { this.c = c; setWide(); },"public final void setIncrement(final int c) { if (!isValidShort(c)) { throw new ClassGenException(""Illegal increment: "" + c); } this.c = c; setWide(); }",yes,yes,"Adds signed-short bounds validation for the increment. Previously, an out-of-range value was accepted and could later be truncated when dumped; the updated method rejects it with `ClassGenException`, and the Javadoc is updated to document the new exception behavior"
+008,88916beeb3aeb2501017646d3affbb2ede18f473,"org.apache.bcel.generic.LocalVariableInstruction.initFromFile(ByteSequence,boolean)",/** Reads needed data (for example index) from file. <pre>(ILOAD <= tag <= ALOAD_3) || (ISTORE <= tag <= ASTORE_3)</pre> */,/** Reads needed data (for example index) from file. <pre>(ILOAD <= tag <= ALOAD_3) || (ISTORE <= tag <= ASTORE_3)</pre> */,"protected void initFromFile(final ByteSequence bytes, final boolean wide) throws IOException { if (wide) { n = bytes.readUnsignedShort(); super.setLength(4); } else { final short opcode = super.getOpcode(); if (opcode >= Const.ILOAD && opcode <= Const.ALOAD || opcode >= Const.ISTORE && opcode <= Const.ASTORE) { n = bytes.readUnsignedByte(); super.setLength(2); } else { if (opcode <= Const.ALOAD_3) { n = (opcode - Const.ILOAD_0) % 4; } else { n = (opcode - Const.ISTORE_0) % 4; } super.setLength(1); } } }","`protected void initFromFile(final ByteSequence bytes, final boolean wide) throws IOException {`
+`         if (wide) {`
+`             n = bytes.readUnsignedShort();`
+`-            super.setLength(4);`
+`+            // dump() emits the wide prefix only when the index needs it, so match that width here.`
+`+            super.setLength(wide() ? 4 : 2);`
+`         } else {`
+`             final short opcode = super.getOpcode();`
+`             if (opcode >= Const.ILOAD && opcode <= Const.ALOAD || opcode >= Const.ISTORE && opcode <= Const.ASTORE) {`
+`                 n = bytes.readUnsignedByte();`
+`                 super.setLength(2);`
+`             } else {`
+`                 if (opcode <= Const.ALOAD_3) { // compact load instruction such as ILOAD_2`
+`                     n = (opcode - Const.ILOAD_0) % 4;`
+`                 } else { // Assert ISTORE_0 <= tag <= ASTORE_3`
+`                     n = (opcode - Const.ISTORE_0) % 4;`
+`                 }`
+`                 super.setLength(1);`
+`             }`
+`         }`
+`     }`",yes,yes,Code changes instruction-length handling for the wide input case so the stored length matches the bytes emitted by dump(`)`. The associated Javadoc remains unchanged despite the behavioral correction.
+009,9d49870b1ebd47f5c14daed4d00f15d7f58d13ad,"org.apache.bcel.generic.INVOKEINTERFACE.INVOKEINTERFACE(int,int)",/** Constructs an INVOKEINTERFACE instruction. @param index index into constant pool. @param nargs number of arguments. */,/** Constructs an INVOKEINTERFACE instruction. @param index index into constant pool. @param nargs number of arguments. */,"public INVOKEINTERFACE(final int index, final int nargs) { super(Const.INVOKEINTERFACE, index); super.setLength(5); if (nargs < 1) { throw new ClassGenException(""Number of arguments must be > 0 "" + nargs); } this.nargs = nargs; }","` public INVOKEINTERFACE(final int index, final int nargs) {`
+`         super(Const.INVOKEINTERFACE, index);`
+`         super.setLength(5);`
+`-        if (nargs < 1) {`
+`-            throw new ClassGenException(""Number of arguments must be > 0 "" + nargs);`
+`+        if (nargs < 1 || nargs > Const.MAX_BYTE) {`
+`+            throw new ClassGenException(""Number of arguments out of range (1 - "" + Const.MAX_BYTE + ""): "" + nargs);`
+`         }`
+`         this.nargs = nargs;`
+`     }`",yes,yes,"Code adds an upper-bound check for nargs, restricting it to 1 through Const.MAX_BYTE, while the associated Javadoc remains unchanged and does not document the enforced range or thrown ClassGenException. Code change, but document doesn’t update"
+009,9d49870b1ebd47f5c14daed4d00f15d7f58d13ad,"org.apache.bcel.generic.INVOKEINTERFACE.INVOKEINTERFACE(int,int)",/** Constructs an INVOKEINTERFACE instruction. @param index index into constant pool. @param nargs number of arguments. */,/** Constructs an INVOKEINTERFACE instruction. @param index index into constant pool. @param nargs number of arguments. */,"public INVOKEINTERFACE(final int index, final int nargs) { super(Const.INVOKEINTERFACE, index); super.setLength(5); if (nargs < 1) { throw new ClassGenException(""Number of arguments must be > 0 "" + nargs); } this.nargs = nargs; }","` public INVOKEINTERFACE(final int index, final int nargs) {`
+`         super(Const.INVOKEINTERFACE, index);`
+`         super.setLength(5);`
+`-        if (nargs < 1) {`
+`-            throw new ClassGenException(""Number of arguments must be > 0 "" + nargs);`
+`+        if (nargs < 1 || nargs > Const.MAX_BYTE) {`
+`+            throw new ClassGenException(""Number of arguments out of range (1 - "" + Const.MAX_BYTE + ""): "" + nargs);`
+`         }`
+`         this.nargs = nargs;`
+`     }`",yes,yes,"Code adds an upper-bound check for nargs, restricting it to 1 through Const.MAX_BYTE, while the associated Javadoc remains unchanged and does not document the enforced range or thrown ClassGenException. Code change, but document doesn’t update"
+010,3a49a2da8e65d3e712e37cc0b30e5e294c4783f0,org.apache.bcel.generic.INVOKEDYNAMIC.INVOKEDYNAMIC(int),/** Constructs an INVOKEDYNAMIC instruction. @param index index into constant pool. */,/** Constructs an INVOKEDYNAMIC instruction. @param index index into constant pool. */,"public INVOKEDYNAMIC(final int index) { super(Const.INVOKEDYNAMIC, index); }","` public INVOKEDYNAMIC(final int index) {`
+`         super(Const.INVOKEDYNAMIC, index);`
+`+        super.setLength(5);`
+`     }`",yes,yes,"Constructor now explicitly sets the instruction length to 5 bytes, fixing an incorrect reported length that could shift following instruction offsets. The associated Javadoc remains unchanged despite the code correction."
+011,2aef1be6546ed79cae003dfc0eefd864c211be80,org.apache.bcel.verifier.structurals.InstConstraintVisitor.visitDALOAD(DALOAD),"`/**`
+`      * Ensures the specific preconditions of the said instruction.`
+`      */`","`/**`
+`      * Ensures the specific preconditions of the said instruction.`
+`      */`","public void visitDALOAD(final DALOAD o) { indexOfInt(o, stack().peek()); if (stack().peek(1) == Type.NULL) { return; } if (!(stack().peek(1) instanceof ArrayType)) { constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'.""); } final Type t = ((ArrayType) stack().peek(1)).getBasicType(); if (t != Type.DOUBLE) { constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'.""); } }","` @Override`
+`     public void visitDALOAD(final DALOAD o) {`
+`         indexOfInt(o, stack().peek());`
+`         if (stack().peek(1) == Type.NULL) {`
+`             return;`
+`         }`
+`         if (!(stack().peek(1) instanceof ArrayType)) {`
+`             constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'."");`
+`         }`
+`-        final Type t = ((ArrayType) stack().peek(1)).getBasicType();`
+`+        final Type t = ((ArrayType) stack().peek(1)).getElementType();`
+`         if (t != Type.DOUBLE) {`
+`             constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'."");`
+`         }`
+`     }`",yes,yes,Array verification now checks the immediate element type using getElementType() instead of getBasicType(). The associated Javadoc remains unchanged
+012,2aef1be6546ed79cae003dfc0eefd864c211be80,org.apache.bcel.verifier.structurals.InstConstraintVisitor.visitDALOAD(DALOAD),"`/**`
+`      * Ensures the specific preconditions of the said instruction.`
+`      */`","`/**`
+`      * Ensures the specific preconditions of the said instruction.`
+`      */`","public void visitDALOAD(final DALOAD o) { indexOfInt(o, stack().peek()); if (stack().peek(1) == Type.NULL) { return; } if (!(stack().peek(1) instanceof ArrayType)) { constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'.""); } final Type t = ((ArrayType) stack().peek(1)).getBasicType(); if (t != Type.DOUBLE) { constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'.""); } }","` @Override`
+`     public void visitDALOAD(final DALOAD o) {`
+`         indexOfInt(o, stack().peek());`
+`         if (stack().peek(1) == Type.NULL) {`
+`             return;`
+`         }`
+`         if (!(stack().peek(1) instanceof ArrayType)) {`
+`             constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'."");`
+`         }`
+`-        final Type t = ((ArrayType) stack().peek(1)).getBasicType();`
+`+        final Type t = ((ArrayType) stack().peek(1)).getElementType();`
+`         if (t != Type.DOUBLE) {`
+`             constraintViolated(o, ""Stack next-to-top must be of type double[] but is '"" + stack().peek(1) + ""'."");`
+`         }`
+`     }`",yes,yes,Array verification now checks the immediate element type using getElementType() instead of getBasicType(). The associated Javadoc remains unchanged
+013,5262b90cd95b1c9d288c257ea726c777437728f3,org.apache.bcel.verifier.structurals.InstConstraintVisitor.visitCALOAD(CALOAD),/** Ensures the specific preconditions of the said instruction. */,/** Ensures the specific preconditions of the said instruction. */,"public void visitCALOAD(final CALOAD o) { final Type arrayref = stack().peek(1); final Type index = stack().peek(0); indexOfInt(o, index); arrayrefOfArrayType(o, arrayref); }","` @Override`
+`     public void visitCALOAD(final CALOAD o) {`
+`         final Type arrayref = stack().peek(1);`
+`         final Type index = stack().peek(0);`
+` `
+`         indexOfInt(o, index);`
+`-        arrayrefOfArrayType(o, arrayref);`
+`+        if (arrayrefOfArrayType(o, arrayref) && !((ArrayType) arrayref).getElementType().equals(Type.CHAR)) {`
+`+            constraintViolated(o, ""The 'arrayref' does not refer to an array with elements of type char but to an array of type ""`
+`+                + ((ArrayType) arrayref).getElementType() + ""."");`
+`+        }`
+`     }`",yes,yes,Code now checks that `CALOAD` operates specifically on a `char` array rather than accepting any array type. The associated Javadoc remains unchanged despite the code changing.
+014,1fb2c97f34add3bab499bc603848d9c183df37ef,org.jsoup.helper.HttpConnection.KeyVal.inputStream(InputStream),No comment present,No comment present,"public KeyVal inputStream(InputStream inputStream) { Validate.notNullParam(value, ""inputStream""); this.stream = inputStream; return this; }","`  @Override`
+`         public KeyVal inputStream(InputStream inputStream) {`
+`-            Validate.notNullParam(value, ""inputStream"");`
+`+            Validate.notNullParam(inputStream, ""inputStream"");`
+`             this.stream = inputStream;`
+`             return this;`
+`         }`",yes,yes,"Fixes validation, so that inputStream() checks the actual inputStream argument rather than the value field. Javadoc is unchanged, there was no comment present for this method in old and new code. The code was changed."
+015,3475afc43aae34001dc45f1697dcf3d389ebb9c4,org.jsoup.helper.HttpConnection.KeyVal.inputStream(InputStream),"Regular comment: // we track boolean attributes as null in values - they're just keys. so returns empty for consumers // casts to String, so only for non-internal attributes","/** Boolean attributes have null values, and internal attributes may hold arbitrary objects; return empty for either. */",static String checkNotNull(@Nullable Object val) { return val == null ? EmptyString : (String) val; },"`   static String checkNotNull(@Nullable Object val) {`
+`-        return val == null ? EmptyString : (String) val;`
+`+        return val instanceof String ? (String) val : EmptyString;`
+`     }`",yes,yes,Code implementation changes to return an empty string for non-string values. In old_code they were cast to a string. Docnchanged to add javadoc instead of regular comments.
+016,be8c37562cffa48c36a0f0bda93fc6502fb79b1f,"org.jsoup.parser.TokeniserState.MarkupDeclarationOpen.read(Tokeniser, CharacterReader)","Regular comment // todo: should actually check current namespace, and only non-html allows cdata. until namespace is implemented properly, keep handling as cdata",Comment removed,"else if (r.matchConsume(""[CDATA["")) { t.createTempBuffer(); t.transition(CdataSection); }","`  } else if (r.matchConsume(""[CDATA["")) {`
+`-                // todo: should actually check current namespace, and only non-html allows cdata. until namespace`
+`-                // is implemented properly, keep handling as cdata`
+`-                //} else if (!t.currentNodeInHtmlNS() && r.matchConsume(""[CDATA["")) {`
+`-                t.createTempBuffer();`
+`-                t.transition(CdataSection);`
+`+                if (t.isCdataAllowed()) {`
+`+                    t.createTempBuffer();`
+`+                    t.transition(CdataSection);`
+`+                } else {`
+`+                    t.error(this);`
+`+                    t.createBogusCommentPending();`
+`+                    t.commentPending.append(""[CDATA["");`
+`+                    t.transition(BogusComment);`
+`+                }`",yes,yes,"Code update occurred, but old comment was removed"
+017,8996fce0844e852b1e8979f5cbdb0699ac540e0a,org.jsoup.nodes.Node.outerHtml(),"/** Get the outer HTML of this node. For example, on a {@code p} element, may return {@code <p>Para</p>}. @return outer HTML @see Element#html() @see Element#text() */","/** Get the outer HTML of this node. For example, on a {@code p} element, this may return {@code <p>Para</p>}. @return the outer HTML of this node @see Element#html() @see #outerHtml(Appendable) @see Element#text() */",public String outerHtml() { StringBuilder sb = StringUtil.borrowBuilder(); outerHtml(QuietAppendable.wrap(sb)); return StringUtil.releaseBuilder(sb); },Code stays the same,Yes,No,Javadoc was clarified for the existing `outerHtml()` method and linked to the new `outerHtml(Appendable)` overload. The behavior of this existing method did not change.
+018,fa492001fab9ddd25796adf7997d1dc32d60cb0f,org.jsoup.safety.Cleaner.createSafeElement(Element),"Regular comment, // special case for <a href rel=nofollow>, only apply to external links and // same site, so don't set the nofollow",Comment not changed,"String sourceBase = sourceEl.baseUri(); if (!href.isEmpty() && !sourceBase.isEmpty() && href.startsWith(sourceBase)) { enforcedAttrs.remove(""rel""); }","+ if (!href.isEmpty()) { + try { + URL baseUrl = new URL(sourceEl.baseUri()); + URL linkUrl = new URL(href); + String baseHost = baseUrl.getHost(); + if (!baseHost.isEmpty() && baseHost.equalsIgnoreCase(linkUrl.getHost())) + enforcedAttrs.remove(""rel""); + } catch (MalformedURLException ignored) {} + }",Yes,Yes,The code changed how it determines whether a link is from the same site. Previously it compared URL prefixes; now it compares the actual URL hosts. The documentation/comment describing same-site links remained unchanged.
