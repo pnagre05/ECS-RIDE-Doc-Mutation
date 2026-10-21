@@ -1,0 +1,1148 @@
+event_id,issue_type,commit_hash,method_key,old_javadoc,new_javadoc,javadoc_diff,old_code,new_code,code_diff,pairing_correct,semantic_change,student_note
+cl-0001,Stale Doc (Body Changed),54ee8ec1c9c44a6617e8e41acf475a79857ac564,org.apache.commons.lang3.Conversion.hexDigitToInt(char),"/**
+     * Converts a hexadecimal digit into an int using the default (LSB0) bit ordering.
+     *
+     * <p>
+     * '1' is converted to 1
+     * </p>
+     *
+     * @param hexChar The hexadecimal digit to convert.
+     * @return An int equals to {@code hexDigit}.
+     * @throws IllegalArgumentException if {@code hexDigit} is not a hexadecimal digit.
+     */","/**
+     * Converts a hexadecimal digit into an int using the default (LSB0) bit ordering.
+     *
+     * <p>
+     * '1' is converted to 1
+     * </p>
+     *
+     * @param hexChar The hexadecimal digit to convert.
+     * @return An int equals to {@code hexDigit}.
+     * @throws IllegalArgumentException if {@code hexDigit} is not a hexadecimal digit.
+     */",,public static int hexDigitToInt(char) { ... },public static int hexDigitToInt(char) { ... },"--- old_code
++++ new_code
+@@ -1,7 +1,6 @@
+     public static int hexDigitToInt(final char hexChar) {
+-        final int digit = Character.digit(hexChar, 16);
+-        if (digit < 0) {
++        if (!CharUtils.isHex(hexChar)) {
+             throw new IllegalArgumentException(""Cannot convert '"" + hexChar + ""' to a hexadecimal digit"");
+         }
+-        return digit;
++        return Character.digit(hexChar, 16);
+     }
+",yes,yes,Replaces Character.digit validation with CharUtils.isHex(hexChar) so non-ASCII Unicode digits (such as fullwidth or Arabic-Indic characters) are rejected with an IllegalArgumentException
+cl-0002,Stale Doc (Body Changed),54ee8ec1c9c44a6617e8e41acf475a79857ac564,org.apache.commons.lang3.ConversionTest.testHexDigitToInt(),"/**
+     * Tests {@link Conversion#hexDigitToInt(char)}.
+     */","/**
+     * Tests {@link Conversion#hexDigitToInt(char)}.
+     */",,void testHexDigitToInt() { ... },void testHexDigitToInt() { ... },"--- old_code
++++ new_code
+@@ -24,2 +24,7 @@
+         assertIllegalArgumentException(() -> Conversion.hexDigitToInt('G'));
++        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF41')); // FULLWIDTH LATIN SMALL LETTER A
++        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF26')); // FULLWIDTH LATIN CAPITAL LETTER F
++        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF19')); // FULLWIDTH DIGIT NINE
++        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\u0669')); // ARABIC-INDIC DIGIT NINE
++        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\u096B')); // DEVANAGARI DIGIT FIVE
+     }
+",yes,yes,"Adds unit test assertions verifying that hexDigitToInt throws an IllegalArgumentException when passed non-ASCII fullwidth, Arabic-Indic, and Devanagari characters."
+cl-0003,Stale Doc (Body Changed),54ee8ec1c9c44a6617e8e41acf475a79857ac564,org.apache.commons.lang3.ConversionTest.testHexToInt(),"/**
+     * Tests {@link Conversion#hexToInt(String, int, int, int, int)}.
+     */","/**
+     * Tests {@link Conversion#hexToInt(String, int, int, int, int)}.
+     */",,void testHexToInt() { ... },void testHexToInt() { ... },"--- old_code
++++ new_code
+@@ -12,2 +12,3 @@
+         assertIllegalArgumentException(() -> Conversion.hexToInt(src, Integer.MAX_VALUE, 0, 0, Integer.SIZE));
++        assertIllegalArgumentException(() -> Conversion.hexToInt(""\uFF41\uFF41"", 0, 0, 0, 2));
+     }
+",yes,yes,"Adds a unit test assertion confirming that hexToInt throws an IllegalArgumentException when given a string containing fullwidth hexadecimal characters (""\uFF41\uFF41"")."
+cl-0004,Stale Doc (Body Changed),50478b4a5a0a78a0d7c328da7afd73505cfe413c,org.apache.commons.lang3.ConversionTest.testHexDigitToInt(),"/**
+     * Tests {@link Conversion#hexDigitToInt(char)}.
+     */","/**
+     * Tests {@link Conversion#hexDigitToInt(char)}.
+     */",,void testHexDigitToInt() { ... },void testHexDigitToInt() { ... },"--- old_code
++++ new_code
+@@ -23,8 +23,2 @@
+         assertEquals(15, Conversion.hexDigitToInt('f'));
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('G'));
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF41')); // FULLWIDTH LATIN SMALL LETTER A
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF26')); // FULLWIDTH LATIN CAPITAL LETTER F
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF19')); // FULLWIDTH DIGIT NINE
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\u0669')); // ARABIC-INDIC DIGIT NINE
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\u096B')); // DEVANAGARI DIGIT FIVE
+     }
+",yes,yes,Removes the IllegalArgumentException assertions for invalid and non-ASCII hex characters from testHexDigitToInt() so they can be isolated into a dedicated test method.
+cl-0005,Stale Doc (Signature Changed),af1b18e2479b841669b659b89e71f948e229cef0,org.apache.commons.lang3.ConversionTest.testHexDigitToIntIllegalArgumentException() -> org.apache.commons.lang3.ConversionTest.testHexDigitToIntIllegalArgumentException(char),"/**
+     * Tests {@link Conversion#hexDigitToInt(char)}.
+     */","/**
+     * Tests {@link Conversion#hexDigitToInt(char)}.
+     */",,void testHexDigitToIntIllegalArgumentException() { ... },void testHexDigitToIntIllegalArgumentException(char) { ... },"--- old_code
++++ new_code
+@@ -1,8 +1,3 @@
+-    void testHexDigitToIntIllegalArgumentException() {
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('G'));
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF41')); // FULLWIDTH LATIN SMALL LETTER A
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF26')); // FULLWIDTH LATIN CAPITAL LETTER F
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\uFF19')); // FULLWIDTH DIGIT NINE
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\u0669')); // ARABIC-INDIC DIGIT NINE
+-        assertIllegalArgumentException(() -> Conversion.hexDigitToInt('\u096B')); // DEVANAGARI DIGIT FIVE
++    void testHexDigitToIntIllegalArgumentException(final char ch) {
++        assertIllegalArgumentException(() -> Conversion.hexDigitToInt(ch));
+     }
+",yes,yes,Converts the zero-argument exception test method into a parameterized test accepting a single char ch parameter rather than hardcoding six separate assertions
+cl-0006,Stale Doc (Body Changed),9288e2c95f39abd1ff115aeddafaa276ceafae6d,org.apache.commons.lang3.time.Instants.toMillisSince(Instant),"/**
+     * Converts an Instant to milliseconds since that Instant bound to a {@code long} without throwing {@link ArithmeticException}.
+     * <ul>
+     * <li>If the duration milliseconds are greater than {@link Long#MAX_VALUE}, then return {@link Long#MAX_VALUE}.</li>
+     * <li>If the duration milliseconds are lesser than {@link Long#MIN_VALUE}, then return {@link Long#MIN_VALUE}.</li>
+     * <li>If the instant is null, treat it as {@link Instant#EPOCH}.</li>
+     * </ul>
+     *
+     * @param instant The instant to convert, not null.
+     * @return long The duration in milliseconds since the given Instant.
+     */","/**
+     * Converts an Instant to milliseconds since that Instant bound to a {@code long} without throwing {@link ArithmeticException}.
+     * <ul>
+     * <li>If the duration milliseconds are greater than {@link Long#MAX_VALUE}, then return {@link Long#MAX_VALUE}.</li>
+     * <li>If the duration milliseconds are lesser than {@link Long#MIN_VALUE}, then return {@link Long#MIN_VALUE}.</li>
+     * <li>If the instant is null, treat it as {@link Instant#EPOCH}.</li>
+     * </ul>
+     *
+     * @param instant The instant to convert, not null.
+     * @return long The duration in milliseconds since the given Instant.
+     */",,public static long toMillisSince(Instant) { ... },public static long toMillisSince(Instant) { ... },"--- old_code
++++ new_code
+@@ -1,7 +1,9 @@
+     public static long toMillisSince(final Instant instant) {
+-        final Instant instant2 = toInstant(instant);
++        // The sign of the duration is the opposite of the sign of the instant's epoch second: an instant far in the past
++        // yields a large positive duration, an instant far in the future a large negative one. Bind on the duration.
++        final Duration duration = DurationUtils.since(toInstant(instant));
+         try {
+-            return DurationUtils.since(instant2).toMillis();
++            return duration.toMillis();
+         } catch (final ArithmeticException e) {
+-            return toBound(instant2, Long.MIN_VALUE, Long.MAX_VALUE);
++            return duration.isNegative() ? Long.MIN_VALUE : Long.MAX_VALUE;
+         }
+",yes,yes,"Fixes overflow handling when converting a Duration to milliseconds by checking duration.isNegative() directly instead of bounding on the Instant, which has the opposite sign of the elapsed duration."
+cl-0007,Stale Doc (Body Changed),164b290d38323b271bfa4f3c5007323d64a7575b,org.apache.commons.lang3.time.Instants.toMillisSince(Instant),"/**
+     * Converts an Instant to milliseconds since that Instant bound to a {@code long} without throwing {@link ArithmeticException}.
+     * <ul>
+     * <li>If the duration milliseconds are greater than {@link Long#MAX_VALUE}, then return {@link Long#MAX_VALUE}.</li>
+     * <li>If the duration milliseconds are lesser than {@link Long#MIN_VALUE}, then return {@link Long#MIN_VALUE}.</li>
+     * <li>If the instant is null, treat it as {@link Instant#EPOCH}.</li>
+     * </ul>
+     *
+     * @param instant The instant to convert, not null.
+     * @return long The duration in milliseconds since the given Instant.
+     */","/**
+     * Converts an Instant to milliseconds since that Instant bound to a {@code long} without throwing {@link ArithmeticException}.
+     * <ul>
+     * <li>If the duration milliseconds are greater than {@link Long#MAX_VALUE}, then return {@link Long#MAX_VALUE}.</li>
+     * <li>If the duration milliseconds are lesser than {@link Long#MIN_VALUE}, then return {@link Long#MIN_VALUE}.</li>
+     * <li>If the instant is null, treat it as {@link Instant#EPOCH}.</li>
+     * </ul>
+     *
+     * @param instant The instant to convert, not null.
+     * @return long The duration in milliseconds since the given Instant.
+     */",,public static long toMillisSince(Instant) { ... },public static long toMillisSince(Instant) { ... },"--- old_code
++++ new_code
+@@ -1,10 +1,3 @@
+     public static long toMillisSince(final Instant instant) {
+-        // The sign of the duration is the opposite of the sign of the instant's epoch second: an instant far in the past
+-        // yields a large positive duration, an instant far in the future a large negative one. Bind on the duration.
+-        final Duration duration = DurationUtils.since(toInstant(instant));
+-        try {
+-            return duration.toMillis();
+-        } catch (final ArithmeticException e) {
+-            return duration.isNegative() ? Long.MIN_VALUE : Long.MAX_VALUE;
+-        }
++        return DurationUtils.toMillisLong(DurationUtils.since(toInstant(instant)));
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0008,Stale Doc (Body Changed),10f4421456b891d5a426348511383f387c99f3e1,org.apache.commons.lang3.math.Fraction.multiplyBy(Fraction),"/**
+     * Multiplies the value of this fraction by another, returning the
+     * result in reduced form.
+     *
+     * @param fraction  The fraction to multiply by, must not be {@code null}
+     * @return A {@link Fraction} instance with the resulting values
+     * @throws NullPointerException if the fraction is {@code null}
+     * @throws ArithmeticException if the resulting numerator or denominator exceeds
+     *  {@code Integer.MAX_VALUE}
+     */","/**
+     * Multiplies the value of this fraction by another, returning the
+     * result in reduced form.
+     *
+     * @param fraction  The fraction to multiply by, must not be {@code null}
+     * @return A {@link Fraction} instance with the resulting values
+     * @throws NullPointerException if the fraction is {@code null}
+     * @throws ArithmeticException if the resulting numerator or denominator exceeds
+     *  {@code Integer.MAX_VALUE}
+     */",,public Fraction multiplyBy(Fraction) { ... },public Fraction multiplyBy(Fraction) { ... },"--- old_code
++++ new_code
+@@ -7,5 +7,14 @@
+         // make sure we don't overflow unless the result *must* overflow.
+-        final int d1 = greatestCommonDivisor(numerator, fraction.denominator);
+-        final int d2 = greatestCommonDivisor(fraction.numerator, denominator);
+-        return getReducedFraction(mulAndCheck(numerator / d1, fraction.numerator / d2), mulPosAndCheck(denominator / d2, fraction.denominator / d1));
++        // Reduce both operands first: the cross-gcd below cancels the cross terms only, so a
++        // factor shared inside an unreduced operand survives into the product and can overflow
++        // an int even when the reduced result fits.
++        final int thisGcd = greatestCommonDivisor(numerator, denominator);
++        final int thatGcd = greatestCommonDivisor(fraction.numerator, fraction.denominator);
++        final int thisNumerator = numerator / thisGcd;
++        final int thisDenominator = denominator / thisGcd;
++        final int thatNumerator = fraction.numerator / thatGcd;
++        final int thatDenominator = fraction.denominator / thatGcd;
++        final int d1 = greatestCommonDivisor(thisNumerator, thatDenominator);
++        final int d2 = greatestCommonDivisor(thatNumerator, thisDenominator);
++        return getReducedFraction(mulAndCheck(thisNumerator / d1, thatNumerator / d2), mulPosAndCheck(thisDenominator / d2, thatDenominator / d1));
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0009,Stale Doc (Body Changed),4ee32aa56d596e31f50fbf325c2641591e9e1ea4,"org.apache.commons.lang3.StringUtils.containsAny(CharSequence, char)","/**
+     * Tests if the CharSequence contains any character in the given set of characters.
+     *
+     * <p>
+     * A {@code null} CharSequence will return {@code false}. A {@code null} or zero length search array will return {@code false}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.containsAny(null, *)                  = false
+     * StringUtils.containsAny("""", *)                    = false
+     * StringUtils.containsAny(*, null)                  = false
+     * StringUtils.containsAny(*, [])                    = false
+     * StringUtils.containsAny(""zzabyycdxx"", 'z', 'a')   = true
+     * StringUtils.containsAny(""zzabyycdxx"", 'b', 'y')   = true
+     * StringUtils.containsAny(""zzabyycdxx"", 'z', 'y')   = true
+     * StringUtils.containsAny(""aba"", 'z])               = false
+     * </pre>
+     *
+     * @param cs          The CharSequence to check, may be null.
+     * @param searchChars The chars to search for, may be null.
+     * @return The {@code true} if any of the chars are found, {@code false} if no match or null input.
+     * @since 2.4
+     * @since 3.0 Changed signature from containsAny(String, char[]) to containsAny(CharSequence, char...)
+     */","/**
+     * Tests if the CharSequence contains any character in the given set of characters.
+     *
+     * <p>
+     * A {@code null} CharSequence will return {@code false}. A {@code null} or zero length search array will return {@code false}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.containsAny(null, *)                  = false
+     * StringUtils.containsAny("""", *)                    = false
+     * StringUtils.containsAny(*, null)                  = false
+     * StringUtils.containsAny(*, [])                    = false
+     * StringUtils.containsAny(""zzabyycdxx"", 'z', 'a')   = true
+     * StringUtils.containsAny(""zzabyycdxx"", 'b', 'y')   = true
+     * StringUtils.containsAny(""zzabyycdxx"", 'z', 'y')   = true
+     * StringUtils.containsAny(""aba"", 'z])               = false
+     * </pre>
+     *
+     * @param cs          The CharSequence to check, may be null.
+     * @param searchChars The chars to search for, may be null.
+     * @return The {@code true} if any of the chars are found, {@code false} if no match or null input.
+     * @since 2.4
+     * @since 3.0 Changed signature from containsAny(String, char[]) to containsAny(CharSequence, char...)
+     */",,"public static boolean containsAny(CharSequence, char) { ... }","public static boolean containsAny(CharSequence, char) { ... }","--- old_code
++++ new_code
+@@ -12,3 +12,5 @@
+                 if (searchChars[j] == ch) {
+-                    if (!Character.isHighSurrogate(ch) || j == searchLast || i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
++                    if (Character.isHighSurrogate(ch)
++                            ? j == searchLast || i < csLast && searchChars[j + 1] == cs.charAt(i + 1)
++                            : j == 0 || !Character.isLowSurrogate(ch) || !Character.isHighSurrogate(searchChars[j - 1]) || i > 0 && searchChars[j - 1] == cs.charAt(i - 1)) {
+                         return true;
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0010,Stale Doc (Body Changed),4ee32aa56d596e31f50fbf325c2641591e9e1ea4,"org.apache.commons.lang3.StringUtils.containsNone(CharSequence, char)","/**
+     * Tests that the CharSequence does not contain certain characters.
+     *
+     * <p>
+     * A {@code null} CharSequence will return {@code true}. A {@code null} invalid character array will return {@code true}. An empty CharSequence (length()=0)
+     * always returns true.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.containsNone(null, *)               = true
+     * StringUtils.containsNone(*, null)               = true
+     * StringUtils.containsNone("""", *)                 = true
+     * StringUtils.containsNone(""ab"", '')              = true
+     * StringUtils.containsNone(""abab"", 'x', 'y', 'z') = true
+     * StringUtils.containsNone(""ab1"", 'x', 'y', 'z')  = true
+     * StringUtils.containsNone(""abz"", 'x', 'y', 'z')  = false
+     * </pre>
+     *
+     * @param cs          The CharSequence to check, may be null.
+     * @param searchChars An array of invalid chars, may be null.
+     * @return true if it contains none of the invalid chars, or is null.
+     * @since 2.0
+     * @since 3.0 Changed signature from containsNone(String, char[]) to containsNone(CharSequence, char...)
+     */","/**
+     * Tests that the CharSequence does not contain certain characters.
+     *
+     * <p>
+     * A {@code null} CharSequence will return {@code true}. A {@code null} invalid character array will return {@code true}. An empty CharSequence (length()=0)
+     * always returns true.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.containsNone(null, *)               = true
+     * StringUtils.containsNone(*, null)               = true
+     * StringUtils.containsNone("""", *)                 = true
+     * StringUtils.containsNone(""ab"", '')              = true
+     * StringUtils.containsNone(""abab"", 'x', 'y', 'z') = true
+     * StringUtils.containsNone(""ab1"", 'x', 'y', 'z')  = true
+     * StringUtils.containsNone(""abz"", 'x', 'y', 'z')  = false
+     * </pre>
+     *
+     * @param cs          The CharSequence to check, may be null.
+     * @param searchChars An array of invalid chars, may be null.
+     * @return true if it contains none of the invalid chars, or is null.
+     * @since 2.0
+     * @since 3.0 Changed signature from containsNone(String, char[]) to containsNone(CharSequence, char...)
+     */",,"public static boolean containsNone(CharSequence, char) { ... }","public static boolean containsNone(CharSequence, char) { ... }","--- old_code
++++ new_code
+@@ -12,3 +12,5 @@
+                 if (searchChars[j] == ch) {
+-                    if (!Character.isHighSurrogate(ch) || j == searchLast || i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
++                    if (Character.isHighSurrogate(ch)
++                            ? j == searchLast || i < csLast && searchChars[j + 1] == cs.charAt(i + 1)
++                            : j == 0 || !Character.isLowSurrogate(ch) || !Character.isHighSurrogate(searchChars[j - 1]) || i > 0 && searchChars[j - 1] == cs.charAt(i - 1)) {
+                         return false;
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0011,Stale Doc (Body Changed),4ee32aa56d596e31f50fbf325c2641591e9e1ea4,"org.apache.commons.lang3.StringUtils.indexOfAny(CharSequence, int, char)","/**
+     * Search a CharSequence to find the first index of any character in the given set of characters.
+     *
+     * <p>
+     * A {@code null} String will return {@code -1}. A {@code null} or zero length search array will return {@code -1}.
+     * </p>
+     * <p>
+     * The following is the same as {@code indexOfAny(cs, 0, searchChars)}.
+     * </p>
+     * <pre>
+     * StringUtils.indexOfAny(null, 0, *)                  = -1
+     * StringUtils.indexOfAny("""", 0, *)                    = -1
+     * StringUtils.indexOfAny(*, 0, null)                  = -1
+     * StringUtils.indexOfAny(*, 0, [])                    = -1
+     * StringUtils.indexOfAny(""zzabyycdxx"", 0, ['z', 'a']) = 0
+     * StringUtils.indexOfAny(""zzabyycdxx"", 0, ['b', 'y']) = 3
+     * StringUtils.indexOfAny(""aba"", 0, ['z'])             = -1
+     * </pre>
+     *
+     * @param cs          The CharSequence to check, may be null.
+     * @param csStart Start searching the input {@code cs} at this index.
+     * @param searchChars The chars to search for, may be null.
+     * @return The index of any of the chars, -1 if no match or null input.
+     * @since 2.0
+     * @since 3.0 Changed signature from indexOfAny(String, char[]) to indexOfAny(CharSequence, char...)
+     */","/**
+     * Search a CharSequence to find the first index of any character in the given set of characters.
+     *
+     * <p>
+     * A {@code null} String will return {@code -1}. A {@code null} or zero length search array will return {@code -1}.
+     * </p>
+     * <p>
+     * The following is the same as {@code indexOfAny(cs, 0, searchChars)}.
+     * </p>
+     * <pre>
+     * StringUtils.indexOfAny(null, 0, *)                  = -1
+     * StringUtils.indexOfAny("""", 0, *)                    = -1
+     * StringUtils.indexOfAny(*, 0, null)                  = -1
+     * StringUtils.indexOfAny(*, 0, [])                    = -1
+     * StringUtils.indexOfAny(""zzabyycdxx"", 0, ['z', 'a']) = 0
+     * StringUtils.indexOfAny(""zzabyycdxx"", 0, ['b', 'y']) = 3
+     * StringUtils.indexOfAny(""aba"", 0, ['z'])             = -1
+     * </pre>
+     *
+     * @param cs          The CharSequence to check, may be null.
+     * @param csStart Start searching the input {@code cs} at this index.
+     * @param searchChars The chars to search for, may be null.
+     * @return The index of any of the chars, -1 if no match or null input.
+     * @since 2.0
+     * @since 3.0 Changed signature from indexOfAny(String, char[]) to indexOfAny(CharSequence, char...)
+     */",,"public static int indexOfAny(CharSequence, int, char) { ... }","public static int indexOfAny(CharSequence, int, char) { ... }","--- old_code
++++ new_code
+@@ -12,3 +12,5 @@
+                 if (searchChars[j] == ch) {
+-                    if (!Character.isHighSurrogate(ch) || j == searchLast || i < csLast && searchChars[j + 1] == cs.charAt(i + 1)) {
++                    if (Character.isHighSurrogate(ch)
++                            ? j == searchLast || i < csLast && searchChars[j + 1] == cs.charAt(i + 1)
++                            : j == 0 || !Character.isLowSurrogate(ch) || !Character.isHighSurrogate(searchChars[j - 1]) || i > 0 && searchChars[j - 1] == cs.charAt(i - 1)) {
+                         return i;
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0012,Stale Doc (Body Changed),62f6edfd96008fd10cd22bf854cf4e8d2c008ae2,org.apache.commons.lang3.StringUtils.chop(String),"/**
+     * Removes the last character from a String.
+     *
+     * <p>
+     * If the String ends in {@code \r\n}, then remove both of them.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.chop(null)          = null
+     * StringUtils.chop("""")            = """"
+     * StringUtils.chop(""abc \r"")      = ""abc ""
+     * StringUtils.chop(""abc\n"")       = ""abc""
+     * StringUtils.chop(""abc\r\n"")     = ""abc""
+     * StringUtils.chop(""abc"")         = ""ab""
+     * StringUtils.chop(""abc\nabc"")    = ""abc\nab""
+     * StringUtils.chop(""a"")           = """"
+     * StringUtils.chop(""\r"")          = """"
+     * StringUtils.chop(""\n"")          = """"
+     * StringUtils.chop(""\r\n"")        = """"
+     * </pre>
+     *
+     * @param str The String to chop last character from, may be null.
+     * @return String without last character, {@code null} if null String input.
+     */","/**
+     * Removes the last character from a String.
+     *
+     * <p>
+     * If the String ends in {@code \r\n}, then remove both of them.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.chop(null)          = null
+     * StringUtils.chop("""")            = """"
+     * StringUtils.chop(""abc \r"")      = ""abc ""
+     * StringUtils.chop(""abc\n"")       = ""abc""
+     * StringUtils.chop(""abc\r\n"")     = ""abc""
+     * StringUtils.chop(""abc"")         = ""ab""
+     * StringUtils.chop(""abc\nabc"")    = ""abc\nab""
+     * StringUtils.chop(""a"")           = """"
+     * StringUtils.chop(""\r"")          = """"
+     * StringUtils.chop(""\n"")          = """"
+     * StringUtils.chop(""\r\n"")        = """"
+     * </pre>
+     *
+     * @param str The String to chop last character from, may be null.
+     * @return String without last character, {@code null} if null String input.
+     */",,public static String chop(String) { ... },public static String chop(String) { ... },"--- old_code
++++ new_code
+@@ -9,2 +9,6 @@
+         final int lastIdx = strLen - 1;
++        // keep the cut off the middle of a surrogate pair so the result is never left holding a lone surrogate
++        if (splitsSurrogatePair(str, lastIdx)) {
++            return str.substring(0, lastIdx - 1);
++        }
+         final String ret = str.substring(0, lastIdx);
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0013,Stale Doc (Body Changed),8bf8b78700c778b10049131f51b687195e039da9,"org.apache.commons.lang3.SystemProperties.getPath(String, Supplier)","/**
+     * Gets the current value for the property named {@code key} as a {@link Path}.
+     * <p>
+     * If a {@link SecurityException} is caught, the return value is {@code null}.
+     * </p>
+     *
+     * @param key             The key.
+     * @param defaultIfAbsent The default value.
+     * @return A {@link Path} or {@code defaultIfAbsent}'s value.
+     * @since 3.20.0
+     */","/**
+     * Gets the current value for the property named {@code key} as a {@link Path}.
+     * <p>
+     * If a {@link SecurityException} is caught, the return value is {@code null}.
+     * </p>
+     *
+     * @param key             The key.
+     * @param defaultIfAbsent The default value.
+     * @return A {@link Path} or {@code defaultIfAbsent}'s value.
+     * @since 3.20.0
+     */",,"public static Path getPath(String, Supplier) { ... }","public static Path getPath(String, Supplier) { ... }","--- old_code
++++ new_code
+@@ -2,3 +2,3 @@
+         final String str = getProperty(key);
+-        return str == null ? defaultIfAbsent != null ? defaultIfAbsent.get() : null : Paths.get(str);
++        return str == null ? Suppliers.get(defaultIfAbsent) : Paths.get(str);
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0014,Stale Doc (Body Changed),c747711133c3e13d8d2bdab27a2eb7b11f1c6d7f,"org.apache.commons.lang3.StringUtils.stripEnd(String, String)","/**
+     * Strips any of a set of characters from the end of a String.
+     *
+     * <p>
+     * A {@code null} input String returns {@code null}. An empty string ("""") input returns the empty string.
+     * </p>
+     *
+     * <p>
+     * If the stripChars String is {@code null}, whitespace is stripped as defined by {@link Character#isWhitespace(char)}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.stripEnd(null, *)          = null
+     * StringUtils.stripEnd("""", *)            = """"
+     * StringUtils.stripEnd(""abc"", """")        = ""abc""
+     * StringUtils.stripEnd(""abc"", null)      = ""abc""
+     * StringUtils.stripEnd(""  abc"", null)    = ""  abc""
+     * StringUtils.stripEnd(""abc  "", null)    = ""abc""
+     * StringUtils.stripEnd("" abc "", null)    = "" abc""
+     * StringUtils.stripEnd(""  abcyx"", ""xyz"") = ""  abc""
+     * StringUtils.stripEnd(""120.00"", "".0"")   = ""12""
+     * </pre>
+     *
+     * @param str        The String to remove characters from, may be null.
+     * @param stripChars The set of characters to remove, null treated as whitespace.
+     * @return The stripped String, {@code null} if null String input.
+     */","/**
+     * Strips any of a set of characters from the end of a String.
+     *
+     * <p>
+     * A {@code null} input String returns {@code null}. An empty string ("""") input returns the empty string.
+     * </p>
+     *
+     * <p>
+     * If the stripChars String is {@code null}, whitespace is stripped as defined by {@link Character#isWhitespace(char)}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.stripEnd(null, *)          = null
+     * StringUtils.stripEnd("""", *)            = """"
+     * StringUtils.stripEnd(""abc"", """")        = ""abc""
+     * StringUtils.stripEnd(""abc"", null)      = ""abc""
+     * StringUtils.stripEnd(""  abc"", null)    = ""  abc""
+     * StringUtils.stripEnd(""abc  "", null)    = ""abc""
+     * StringUtils.stripEnd("" abc "", null)    = "" abc""
+     * StringUtils.stripEnd(""  abcyx"", ""xyz"") = ""  abc""
+     * StringUtils.stripEnd(""120.00"", "".0"")   = ""12""
+     * </pre>
+     *
+     * @param str        The String to remove characters from, may be null.
+     * @param stripChars The set of characters to remove, null treated as whitespace.
+     * @return The stripped String, {@code null} if null String input.
+     */",,"public static String stripEnd(String, String) { ... }","public static String stripEnd(String, String) { ... }","--- old_code
++++ new_code
+@@ -12,4 +12,8 @@
+         } else {
+-            while (end != 0 && stripChars.indexOf(str.charAt(end - 1)) != INDEX_NOT_FOUND) {
+-                end--;
++            while (end != 0) {
++                final int codePoint = str.codePointBefore(end);
++                if (stripChars.indexOf(codePoint) == INDEX_NOT_FOUND) {
++                    break;
++                }
++                end -= Character.charCount(codePoint);
+             }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0015,Stale Doc (Body Changed),c747711133c3e13d8d2bdab27a2eb7b11f1c6d7f,"org.apache.commons.lang3.StringUtils.stripStart(String, String)","/**
+     * Strips any of a set of characters from the start of a String.
+     *
+     * <p>
+     * A {@code null} input String returns {@code null}. An empty string ("""") input returns the empty string.
+     * </p>
+     *
+     * <p>
+     * If the stripChars String is {@code null}, whitespace is stripped as defined by {@link Character#isWhitespace(char)}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.stripStart(null, *)          = null
+     * StringUtils.stripStart("""", *)            = """"
+     * StringUtils.stripStart(""abc"", """")        = ""abc""
+     * StringUtils.stripStart(""abc"", null)      = ""abc""
+     * StringUtils.stripStart(""  abc"", null)    = ""abc""
+     * StringUtils.stripStart(""abc  "", null)    = ""abc  ""
+     * StringUtils.stripStart("" abc "", null)    = ""abc ""
+     * StringUtils.stripStart(""yxabc  "", ""xyz"") = ""abc  ""
+     * </pre>
+     *
+     * @param str        The String to remove characters from, may be null.
+     * @param stripChars The characters to remove, null treated as whitespace.
+     * @return The stripped String, {@code null} if null String input.
+     */","/**
+     * Strips any of a set of characters from the start of a String.
+     *
+     * <p>
+     * A {@code null} input String returns {@code null}. An empty string ("""") input returns the empty string.
+     * </p>
+     *
+     * <p>
+     * If the stripChars String is {@code null}, whitespace is stripped as defined by {@link Character#isWhitespace(char)}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.stripStart(null, *)          = null
+     * StringUtils.stripStart("""", *)            = """"
+     * StringUtils.stripStart(""abc"", """")        = ""abc""
+     * StringUtils.stripStart(""abc"", null)      = ""abc""
+     * StringUtils.stripStart(""  abc"", null)    = ""abc""
+     * StringUtils.stripStart(""abc  "", null)    = ""abc  ""
+     * StringUtils.stripStart("" abc "", null)    = ""abc ""
+     * StringUtils.stripStart(""yxabc  "", ""xyz"") = ""abc  ""
+     * </pre>
+     *
+     * @param str        The String to remove characters from, may be null.
+     * @param stripChars The characters to remove, null treated as whitespace.
+     * @return The stripped String, {@code null} if null String input.
+     */",,"public static String stripStart(String, String) { ... }","public static String stripStart(String, String) { ... }","--- old_code
++++ new_code
+@@ -13,4 +13,8 @@
+         } else {
+-            while (start != strLen && stripChars.indexOf(str.charAt(start)) != INDEX_NOT_FOUND) {
+-                start++;
++            while (start != strLen) {
++                final int codePoint = str.codePointAt(start);
++                if (stripChars.indexOf(codePoint) == INDEX_NOT_FOUND) {
++                    break;
++                }
++                start += Character.charCount(codePoint);
+             }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0016,Stale Doc (Body Changed),1d6ef29ce004309e50bd91e27f0f5e80e1a57a76,org.apache.commons.lang3.CharRange.contains(CharRange),"/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */","/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */",,public boolean contains(CharRange) { ... },public boolean contains(CharRange) { ... },"--- old_code
++++ new_code
+@@ -9,2 +9,14 @@
+         if (range.negated) {
++            // range denotes [0, range.start - 1] union [range.end + 1, Character.MAX_VALUE]
++            final boolean lowEmpty = range.start == 0;
++            final boolean highEmpty = range.end == Character.MAX_VALUE;
++            if (lowEmpty && highEmpty) {
++                return true; // range denotes the empty set
++            }
++            if (lowEmpty) {
++                return end == Character.MAX_VALUE && start <= range.end + 1;
++            }
++            if (highEmpty) {
++                return start == 0 && end + 1 >= range.start;
++            }
+             return start == 0 && end == Character.MAX_VALUE;
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0017,Stale Doc (Body Changed),7f8b51413a8cc2dfadaba137144815932e7b243f,org.apache.commons.lang3.CharRange.contains(CharRange),"/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */","/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */",,public boolean contains(CharRange) { ... },public boolean contains(CharRange) { ... },"--- old_code
++++ new_code
+@@ -10,3 +10,3 @@
+             // range denotes [0, range.start - 1] union [range.end + 1, Character.MAX_VALUE]
+-            final boolean lowEmpty = range.start == 0;
++            final boolean lowEmpty = range.start == Character.MIN_VALUE;
+             final boolean highEmpty = range.end == Character.MAX_VALUE;
+@@ -19,5 +19,5 @@
+             if (highEmpty) {
+-                return start == 0 && end + 1 >= range.start;
++                return start == Character.MIN_VALUE && end + 1 >= range.start;
+             }
+-            return start == 0 && end == Character.MAX_VALUE;
++            return start == Character.MIN_VALUE && end == Character.MAX_VALUE;
+         }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0018,Stale Doc (Body Changed),13e38e1fb3b37c93c2ce0497c5ab1428695ccf96,org.apache.commons.lang3.CharRange.contains(CharRange),"/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */","/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */",,public boolean contains(CharRange) { ... },public boolean contains(CharRange) { ... },"--- old_code
++++ new_code
+@@ -10,11 +10,11 @@
+             // range denotes [0, range.start - 1] union [range.end + 1, Character.MAX_VALUE]
+-            final boolean lowEmpty = range.start == Character.MIN_VALUE;
+-            final boolean highEmpty = range.end == Character.MAX_VALUE;
+-            if (lowEmpty && highEmpty) {
++            if (range.isEmpty()) {
+                 return true; // range denotes the empty set
+             }
+-            if (lowEmpty) {
++            if (range.start == Character.MIN_VALUE) {
++                // range denotes [range.end + 1, Character.MAX_VALUE]
+                 return end == Character.MAX_VALUE && start <= range.end + 1;
+             }
+-            if (highEmpty) {
++            if (range.end == Character.MAX_VALUE) {
++                // range denotes [0, range.start - 1]
+                 return start == Character.MIN_VALUE && end + 1 >= range.start;
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0019,Stale Doc (Body Changed),e66ad3dd2e8538e24940d97179c960a60dd25495,org.apache.commons.lang3.CharRange.prepareNext(),"/**
+         * Prepares the next character in the range.
+         */","/**
+         * Prepares the next character in the range.
+         */",,private void prepareNext() { ... },private void prepareNext() { ... },"--- old_code
++++ new_code
+@@ -5,3 +5,3 @@
+                 } else if (current + 1 == range.start) {
+-                    if (range.end == Character.MAX_VALUE) {
++                    if (range.isEndMax()) {
+                         hasNext = false;
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0020,Stale Doc (Body Changed),e66ad3dd2e8538e24940d97179c960a60dd25495,org.apache.commons.lang3.CharRange.contains(CharRange),"/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */","/**
+     * Are all the characters of the passed in range contained in
+     * this range.
+     *
+     * @param range  The range to check against.
+     * @return {@code true} if this range entirely contains the input range.
+     * @throws NullPointerException if {@code null} input.
+     */",,public boolean contains(CharRange) { ... },public boolean contains(CharRange) { ... },"--- old_code
++++ new_code
+@@ -13,11 +13,11 @@
+             }
+-            if (range.start == Character.MIN_VALUE) {
++            if (range.isStartMin()) {
+                 // range denotes [range.end + 1, Character.MAX_VALUE]
+-                return end == Character.MAX_VALUE && start <= range.end + 1;
++                return isEndMax() && start <= range.end + 1;
+             }
+-            if (range.end == Character.MAX_VALUE) {
++            if (range.isEndMax()) {
+                 // range denotes [0, range.start - 1]
+-                return start == Character.MIN_VALUE && end + 1 >= range.start;
++                return isStartMin() && end + 1 >= range.start;
+             }
+-            return start == Character.MIN_VALUE && end == Character.MAX_VALUE;
++            return isStartMin() && isEndMax();
+         }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0021,Stale Doc (Body Changed),e66ad3dd2e8538e24940d97179c960a60dd25495,org.apache.commons.lang3.CharRange.isEmpty(),"/**
+     * Checks if this range denotes the empty set.
+     *
+     * <p>A plain (non-negated) range always contains at least one character and is
+     * therefore never empty. A negated range is empty if and only if it excludes the
+     * entire character space, i.e. if it was created via
+     * {@code isNotIn(Character.MIN_VALUE, Character.MAX_VALUE)}.</p>
+     *
+     * @return {@code true} if this range contains no characters, {@code false} otherwise.
+     */","/**
+     * Checks if this range denotes the empty set.
+     *
+     * <p>A plain (non-negated) range always contains at least one character and is
+     * therefore never empty. A negated range is empty if and only if it excludes the
+     * entire character space, i.e. if it was created via
+     * {@code isNotIn(Character.MIN_VALUE, Character.MAX_VALUE)}.</p>
+     *
+     * @return {@code true} if this range contains no characters, {@code false} otherwise.
+     */",,boolean isEmpty() { ... },boolean isEmpty() { ... },"--- old_code
++++ new_code
+@@ -1,3 +1,3 @@
+     boolean isEmpty() {
+-        return negated && start == Character.MIN_VALUE && end == Character.MAX_VALUE;
++        return negated && isStartMin() && isEndMax();
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0022,Stale Doc (Body Changed),d74371539f821f52d0ed79188afd8a76e0c183fe,org.apache.commons.lang3.CharSet.contains(char),"/**
+     * Tests whether this {@link CharSet} contain the specified character {@code ch}.
+     * <p>
+     * Examples using the negation character:
+     * </p>
+     * <pre>
+     *     CharSet.getInstance(""^a-c"").contains('a') = false
+     *     CharSet.getInstance(""^a-c"").contains('d') = true
+     *     CharSet.getInstance(""^^a-c"").contains('a') = true // (only '^' is negated)
+     *     CharSet.getInstance(""^^a-c"").contains('^') = false
+     *     CharSet.getInstance(""^a-cd-f"").contains('d') = true
+     *     CharSet.getInstance(""a-c^"").contains('^') = true
+     *     CharSet.getInstance(""^"", ""a-c"").contains('^') = true
+     * </pre>
+     *
+     * @param ch The character to check.
+     * @return {@code true} if the set contains the characters.
+     */","/**
+     * Tests whether this {@link CharSet} contain the specified character {@code ch}.
+     * <p>
+     * Examples using the negation character:
+     * </p>
+     * <pre>
+     *     CharSet.getInstance(""^a-c"").contains('a') = false
+     *     CharSet.getInstance(""^a-c"").contains('d') = true
+     *     CharSet.getInstance(""^^a-c"").contains('a') = true // (only '^' is negated)
+     *     CharSet.getInstance(""^^a-c"").contains('^') = false
+     *     CharSet.getInstance(""^a-cd-f"").contains('d') = true
+     *     CharSet.getInstance(""a-c^"").contains('^') = true
+     *     CharSet.getInstance(""^"", ""a-c"").contains('^') = true
+     * </pre>
+     *
+     * @param ch The character to check.
+     * @return {@code true} if the set contains the characters.
+     */",,public boolean contains(char) { ... },public boolean contains(char) { ... },"--- old_code
++++ new_code
+@@ -1,3 +1,3 @@
+     public boolean contains(final char ch) {
+-        synchronized (set) {
++        synchronized (lock) {
+             return set.stream().anyMatch(range -> range.contains(ch));
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0023,Stale Doc (Body Changed),df5245a79364b7e117d00962829a303086c7e5d5,org.apache.commons.lang3.time.StopWatch.formatSplitTime(),"/**
+     * Formats the split time with {@link DurationFormatUtils#formatDurationHMS}.
+     *
+     * @return The split time formatted by {@link DurationFormatUtils#formatDurationHMS}.
+     * @since 3.10
+     */","/**
+     * Formats the split time with {@link DurationFormatUtils#formatDurationHMS}.
+     *
+     * @return The split time formatted by {@link DurationFormatUtils#formatDurationHMS}.
+     * @since 3.10
+     */",,public String formatSplitTime() { ... },public String formatSplitTime() { ... },"--- old_code
++++ new_code
+@@ -1,3 +1,3 @@
+     public String formatSplitTime() {
+-        return DurationFormatUtils.formatDurationHMS(DurationUtils.toMillisInt(getSplitDuration()));
++        return DurationFormatUtils.formatDurationHMS(DurationUtils.toMillisLong(getSplitDuration()));
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0024,Stale Doc (Body Changed),73dadf0094cd3557149312b85c88b7b3d20018fc,"org.apache.commons.lang3.StringUtils.left(String, int)","/**
+     * Gets the leftmost {@code len} characters of a String.
+     *
+     * <p>
+     * If {@code len} characters are not available, or the String is {@code null}, the String will be returned without an exception. An empty String is returned
+     * if len is negative.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.left(null, *)    = null
+     * StringUtils.left(*, -ve)     = """"
+     * StringUtils.left("""", *)      = """"
+     * StringUtils.left(""abc"", 0)   = """"
+     * StringUtils.left(""abc"", 2)   = ""ab""
+     * StringUtils.left(""abc"", 4)   = ""abc""
+     * </pre>
+     *
+     * @param str The String to get the leftmost characters from, may be null.
+     * @param len The length of the required String.
+     * @return The leftmost characters, {@code null} if null String input.
+     */","/**
+     * Gets the leftmost {@code len} characters of a String.
+     *
+     * <p>
+     * If {@code len} characters are not available, or the String is {@code null}, the String will be returned without an exception. An empty String is returned
+     * if len is negative.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.left(null, *)    = null
+     * StringUtils.left(*, -ve)     = """"
+     * StringUtils.left("""", *)      = """"
+     * StringUtils.left(""abc"", 0)   = """"
+     * StringUtils.left(""abc"", 2)   = ""ab""
+     * StringUtils.left(""abc"", 4)   = ""abc""
+     * </pre>
+     *
+     * @param str The String to get the leftmost characters from, may be null.
+     * @param len The length of the required String.
+     * @return The leftmost characters, {@code null} if null String input.
+     */",,"public static String left(String, int) { ... }","public static String left(String, int) { ... }","--- old_code
++++ new_code
+@@ -10,3 +10,8 @@
+         }
+-        return str.substring(0, len);
++        int cut = len;
++        // keep the cut off the middle of a surrogate pair so the result is never left holding a lone surrogate
++        if (splitsSurrogatePair(str, cut)) {
++            cut--;
++        }
++        return str.substring(0, cut);
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0025,Stale Doc (Body Changed),73dadf0094cd3557149312b85c88b7b3d20018fc,"org.apache.commons.lang3.StringUtils.mid(String, int, int)","/**
+     * Gets {@code len} characters from the middle of a String.
+     *
+     * <p>
+     * If {@code len} characters are not available, the remainder of the String will be returned without an exception. If the String is {@code null},
+     * {@code null} will be returned. An empty String is returned if len is negative or exceeds the length of {@code str}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.mid(null, *, *)    = null
+     * StringUtils.mid(*, *, -ve)     = """"
+     * StringUtils.mid("""", 0, *)      = """"
+     * StringUtils.mid(""abc"", 0, 2)   = ""ab""
+     * StringUtils.mid(""abc"", 0, 4)   = ""abc""
+     * StringUtils.mid(""abc"", 2, 4)   = ""c""
+     * StringUtils.mid(""abc"", 4, 2)   = """"
+     * StringUtils.mid(""abc"", -2, 2)  = ""ab""
+     * </pre>
+     *
+     * @param str The String to get the characters from, may be null.
+     * @param pos The position to start from, negative treated as zero.
+     * @param len The length of the required String.
+     * @return The middle characters, {@code null} if null String input.
+     */","/**
+     * Gets {@code len} characters from the middle of a String.
+     *
+     * <p>
+     * If {@code len} characters are not available, the remainder of the String will be returned without an exception. If the String is {@code null},
+     * {@code null} will be returned. An empty String is returned if len is negative or exceeds the length of {@code str}.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.mid(null, *, *)    = null
+     * StringUtils.mid(*, *, -ve)     = """"
+     * StringUtils.mid("""", 0, *)      = """"
+     * StringUtils.mid(""abc"", 0, 2)   = ""ab""
+     * StringUtils.mid(""abc"", 0, 4)   = ""abc""
+     * StringUtils.mid(""abc"", 2, 4)   = ""c""
+     * StringUtils.mid(""abc"", 4, 2)   = """"
+     * StringUtils.mid(""abc"", -2, 2)  = ""ab""
+     * </pre>
+     *
+     * @param str The String to get the characters from, may be null.
+     * @param pos The position to start from, negative treated as zero.
+     * @param len The length of the required String.
+     * @return The middle characters, {@code null} if null String input.
+     */",,"public static String mid(String, int, int) { ... }","public static String mid(String, int, int) { ... }","--- old_code
++++ new_code
+@@ -10,6 +10,16 @@
+         }
++        int start = pos;
++        // keep the start off the middle of a surrogate pair so the result is never left holding a lone surrogate
++        if (splitsSurrogatePair(str, start)) {
++            start++;
++        }
+         if (str.length() - pos <= len) {
+-            return str.substring(pos);
++            return str.substring(start);
+         }
+-        return str.substring(pos, pos + len);
++        int end = pos + len;
++        // keep both cuts off the middle of a surrogate pair so the result is never left holding a lone surrogate
++        if (splitsSurrogatePair(str, end)) {
++            end--;
++        }
++        return str.substring(start, Math.max(start, end));
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0026,Stale Doc (Body Changed),73dadf0094cd3557149312b85c88b7b3d20018fc,"org.apache.commons.lang3.StringUtils.overlay(String, String, int, int)","/**
+     * Overlays part of a String with another String.
+     *
+     * <p>
+     * A {@code null} string input returns {@code null}. A negative index is treated as zero. An index greater than the string length is treated as the string
+     * length. The start index is always the smaller of the two indices.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.overlay(null, *, *, *)            = null
+     * StringUtils.overlay("""", ""abc"", 0, 0)          = ""abc""
+     * StringUtils.overlay(""abcdef"", null, 2, 4)     = ""abef""
+     * StringUtils.overlay(""abcdef"", """", 2, 4)       = ""abef""
+     * StringUtils.overlay(""abcdef"", """", 4, 2)       = ""abef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 2, 4)   = ""abzzzzef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 4, 2)   = ""abzzzzef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", -1, 4)  = ""zzzzef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 2, 8)   = ""abzzzz""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", -2, -3) = ""zzzzabcdef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 8, 10)  = ""abcdefzzzz""
+     * </pre>
+     *
+     * @param str     The String to do overlaying in, may be null.
+     * @param overlay The String to overlay, may be null.
+     * @param start   The position to start overlaying at.
+     * @param end     The position to stop overlaying before.
+     * @return overlayed String, {@code null} if null String input.
+     * @since 2.0
+     */","/**
+     * Overlays part of a String with another String.
+     *
+     * <p>
+     * A {@code null} string input returns {@code null}. A negative index is treated as zero. An index greater than the string length is treated as the string
+     * length. The start index is always the smaller of the two indices.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.overlay(null, *, *, *)            = null
+     * StringUtils.overlay("""", ""abc"", 0, 0)          = ""abc""
+     * StringUtils.overlay(""abcdef"", null, 2, 4)     = ""abef""
+     * StringUtils.overlay(""abcdef"", """", 2, 4)       = ""abef""
+     * StringUtils.overlay(""abcdef"", """", 4, 2)       = ""abef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 2, 4)   = ""abzzzzef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 4, 2)   = ""abzzzzef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", -1, 4)  = ""zzzzef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 2, 8)   = ""abzzzz""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", -2, -3) = ""zzzzabcdef""
+     * StringUtils.overlay(""abcdef"", ""zzzz"", 8, 10)  = ""abcdefzzzz""
+     * </pre>
+     *
+     * @param str     The String to do overlaying in, may be null.
+     * @param overlay The String to overlay, may be null.
+     * @param start   The position to start overlaying at.
+     * @param end     The position to stop overlaying before.
+     * @return overlayed String, {@code null} if null String input.
+     * @since 2.0
+     */",,"public static String overlay(String, String, int, int) { ... }","public static String overlay(String, String, int, int) { ... }","--- old_code
++++ new_code
+@@ -25,2 +25,9 @@
+         }
++        // keep both cuts off the middle of a surrogate pair so the result is never left holding a lone surrogate
++        if (splitsSurrogatePair(str, start)) {
++            start--;
++        }
++        if (splitsSurrogatePair(str, end)) {
++            end++;
++        }
+         return str.substring(0, start) + overlay + str.substring(end);
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0027,Stale Doc (Body Changed),73dadf0094cd3557149312b85c88b7b3d20018fc,"org.apache.commons.lang3.StringUtils.right(String, int)","/**
+     * Gets the rightmost {@code len} characters of a String.
+     *
+     * <p>
+     * If {@code len} characters are not available, or the String is {@code null}, the String will be returned without an exception. An empty String is
+     * returned if len is negative.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.right(null, *)    = null
+     * StringUtils.right(*, -ve)     = """"
+     * StringUtils.right("""", *)      = """"
+     * StringUtils.right(""abc"", 0)   = """"
+     * StringUtils.right(""abc"", 2)   = ""bc""
+     * StringUtils.right(""abc"", 4)   = ""abc""
+     * </pre>
+     *
+     * @param str The String to get the rightmost characters from, may be null.
+     * @param len The length of the required String.
+     * @return The rightmost characters, {@code null} if null String input.
+     */","/**
+     * Gets the rightmost {@code len} characters of a String.
+     *
+     * <p>
+     * If {@code len} characters are not available, or the String is {@code null}, the String will be returned without an exception. An empty String is
+     * returned if len is negative.
+     * </p>
+     *
+     * <pre>
+     * StringUtils.right(null, *)    = null
+     * StringUtils.right(*, -ve)     = """"
+     * StringUtils.right("""", *)      = """"
+     * StringUtils.right(""abc"", 0)   = """"
+     * StringUtils.right(""abc"", 2)   = ""bc""
+     * StringUtils.right(""abc"", 4)   = ""abc""
+     * </pre>
+     *
+     * @param str The String to get the rightmost characters from, may be null.
+     * @param len The length of the required String.
+     * @return The rightmost characters, {@code null} if null String input.
+     */",,"public static String right(String, int) { ... }","public static String right(String, int) { ... }","--- old_code
++++ new_code
+@@ -10,3 +10,8 @@
+         }
+-        return str.substring(str.length() - len);
++        int start = str.length() - len;
++        // keep the cut off the middle of a surrogate pair so the result is never left holding a lone surrogate
++        if (splitsSurrogatePair(str, start)) {
++            start++;
++        }
++        return str.substring(start);
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0028,Stale Doc (Body Changed),d1e60e04f7ddfd51772fbf0859c12407d17e600b,org.apache.commons.lang3.builder.ReflectionDiffBuilder.build(),"/**
+     * {@inheritDoc}
+     *
+     * @throws SecurityException if an underlying accessible object's method denies the request.
+     * @see SecurityManager#checkPermission
+     */","/**
+     * {@inheritDoc}
+     *
+     * @throws SecurityException if an underlying accessible object's method denies the request.
+     * @see SecurityManager#checkPermission
+     */",,public DiffResult build() { ... },public DiffResult build() { ... },"--- old_code
++++ new_code
+@@ -1,7 +1,12 @@
+     public DiffResult<T> build() {
+-        if (getLeft().equals(getRight())) {
++        if (getLeft() == getRight() || isRegistered(getLeft(), getRight())) {
+             return diffBuilder.build();
+         }
+-        appendFields(getLeft().getClass());
+-        return diffBuilder.build();
++        try {
++            register(getLeft(), getRight());
++            appendFields(getLeft().getClass());
++            return diffBuilder.build();
++        } finally {
++            unregister(getLeft(), getRight());
++        }
+     }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0029,Stale Doc (Body Changed),d1e60e04f7ddfd51772fbf0859c12407d17e600b,org.apache.commons.lang3.builder.ReflectionDiffBuilder.appendFields(Class),"/**
+     * Appends fields using reflection.
+     *
+     * @throws SecurityException if an underlying accessible object's method denies the request.
+     * @see SecurityManager#checkPermission
+     */","/**
+     * Appends fields using reflection.
+     *
+     * @throws SecurityException if an underlying accessible object's method denies the request.
+     * @see SecurityManager#checkPermission
+     */",,private void appendFields(Class) { ... },private void appendFields(Class) { ... },"--- old_code
++++ new_code
+@@ -4,7 +4,7 @@
+                 try {
+-                    diffBuilder.append(field.getName(), readField(field, getLeft()), readField(field, getRight()));
+-                } catch (final IllegalAccessException e) {
+-                    // this can't happen. Would get a Security exception instead
+-                    // throw a runtime exception in case the impossible happens.
+-                    throw new IllegalArgumentException(""Unexpected IllegalAccessException: "" + e.getMessage(), e);
++                    if (setAccessible(field)) {
++                        diffBuilder.append(field.getName(), Reflection.getUnchecked(field, getLeft()), Reflection.getUnchecked(field, getRight()));
++                    }
++                } catch (final RuntimeException e) {
++                    // Ignored as per AccessibleObject / SecurityManager / InaccessibleObjectException
+                 }
+",yes,yes,Reduces both this and fraction by their respective greatest common divisors prior to cross-cancellation so shared internal factors cannot cause an unnecessary integer overflow during multiplication.
+cl-0030,Stale Doc (Body Changed),0edbb4ae03fbe14a8204dbb866b0a17f22a4c6f1,"org.apache.commons.lang3.Conversion.binaryToByte(boolean, int, byte, int, int)","/**
+     * Converts binary (represented as boolean array) into a byte using the default (little-endian, LSB0) byte and bit ordering.
+     *
+     * @param src     The binary to convert.
+     * @param srcPos  The position in {@code src}, in boolean unit, from where to start the conversion.
+     * @param dstInit initial value of the destination byte.
+     * @param dstPos  The position of the LSB, in bits, in the result byte.
+     * @param nBools  The number of booleans to convert.
+     * @return A byte containing the selected bits.
+     * @throws NullPointerException           if {@code src} is {@code null}.
+     * @throws IllegalArgumentException       if {@code nBools - 1 + dstPos >= 8}.
+     * @throws ArrayIndexOutOfBoundsException if {@code srcPos + nBools > src.length}.
+     */","/**
+     * Converts binary (represented as boolean array) into a byte using the default (little-endian, LSB0) byte and bit ordering.
+     *
+     * @param src     The binary to convert.
+     * @param srcPos  The position in {@code src}, in boolean unit, from where to start the conversion.
+     * @param dstInit initial value of the destination byte.
+     * @param dstPos  The position of the LSB, in bits, in the result byte.
+     * @param nBools  The number of booleans to convert.
+     * @return A byte containing the selected bits.
+     * @throws NullPointerException           if {@code src} is {@code null}.
+     * @throws IllegalArgumentException       if {@code nBools - 1 + dstPos >= 8}.
+     * @throws ArrayIndexOutOfBoundsException if {@code srcPos + nBools > src.length}.
+     */",,"public static byte binaryToByte(boolean, int, byte, int, int) { ... }","public static byte binaryToByte(boolean, int, byte, int, int) { ... }","--- old_code
++++ new_code
+@@ -4,3 +4,3 @@
+         }
+-        if (nBools - 1 + dstPos >= Byte.SIZE) {
++        if ((long) nBools - 1 + dstPos >= Byte.SIZE) {
+             throw new IllegalArgumentException(""nBools - 1 + dstPos >= 8"");
+",yes,yes,
