@@ -1,0 +1,99 @@
+﻿event_id,method_key/source,Old_javadoc_and_notes,New_javadoc
+cl-0001,#createNumber(String),"Utility method for {@link #createNumber(String)}.
+Returns mantissa of the given number.
+
+
+Becomes more decisive.","Gets the mantissa of the given number.
+Returns mantissa of the given number."
+cl-0002,#createNumber(java.lang.String),"Utility method for {@link #createNumber(java.lang.String)}.
+Returns true if s is null or empty. 
+Clearly conveys what the code actually tests.",Tests whether the given string only contains '0' characters..
+cl-0003,HashCodeBuilderAndEqualsBuilderTest.java,"Tests {@link org.apache.commons.lang3.builder.HashCodeBuilder} and
+
+Changes the Javadoc link from a fully qualified class name to a relative class name. Javadoc resolves the new reference based on package/import context, so this is not merely cosmetic. 
+
+So this is not just a cosmetic change",Tests {@link lang3.builder.HashCodeBuilder} and
+cl-0004,ClassUtils.java,"@return an array which contains for each given class, the primitive class or <strong>null</strong> if the original class is not a wrapper class. 
+
+Javadoc formatting/style improvement. Replaces HTML <strong>null</strong> with {@code null}. No Java behavior changes.","@return an array which contains for each given class, the primitive class or {@code null} if the original class is not a wrapper class."
+cl-0005,LocaleUtils.java,"If a language is empty, or not <em>well-formed</am> ... 
+
+Fixes the malformed closing emphasis tag and Javadoc formatting.","If a language is empty, or not <em>well-formed</em> ..."
+cl-0006,changes.xml,"Bump org.apache.commons:commons-parent from 92 to 97 #1498. 
+
+Corrects the documented Maven parent version from 97 to 98.",Bump org.apache.commons:commons-parent from 92 to 98 #1498.
+cl-0007,BasicThreadFactory.java,"@param exceptionHandler ... <strong>null</strong>
+@return a reference to this {@link Builder}
+@throws NullPointerException ... <strong>null</strong> 
+
+Javadoc formatting/style cleanup. Replaces HTML formatting with {@code null}, improves line formatting, and adds punctuation.","@param exceptionHandler ... {@code null}.
+@return a reference to this {@link Builder}.
+@throws NullPointerException ... {@code null}."
+cl-0008,DurationFormatUtils.java .,"Tests {@link org.apache.commons.lang3.builder.HashCodeBuilder} and
+
+Changes the Javadoc link from a fully qualified class name to a relative class name. Javadoc resolves the new reference based on package/import context, so this is not merely cosmetic. 
+
+So this is not just a cosmetic change",Tests {@link lang3.builder.HashCodeBuilder} and
+cl-0009,DurationFormatUtils.java,"Formats the time gap as a string, using the specified format.
+Padding the left-hand side side of numbers with zeroes is optional.
+
+Stylistic formatting change combining the description into one continuous paragraph.","Formats the time gap as a string, using the specified format. Padding the left-hand side side of numbers with zeroes is optional."
+cl-0010,NumberUtils.java,"Checks whether the {@link String} contains only digit characters. 
+
+Wording/grammar change from “Checks whether” to “Tests whether.”",Tests whether the {@link String} contains only digit characters.
+cl-0011,NumberUtilsTest.java,"assertEquals(Double.NaN, Double.parseDouble(s));
+assertEquals(Float.NaN, Float.parseFloat(s)); 
+
+Test behavior change. Changes the expected parsed values from NaN to positive infinity.","assertEquals(Double.POSITIVE_INFINITY, Double.parseDouble(s));
+assertEquals(Float.POSITIVE_INFINITY, Float.parseFloat(s));"
+cl-0012,Commit_hash - d84fa1a  |  | Documentation files / JSONObject,"Documentation before the May 29 cleanup  
+
+Part of the repository's docs-and-warnings-cleanup work. Because the commit also includes code-warning fixes, we should inspect its diff before labeling individual changes as purely documentation.",Cleaned-up documentation plus related JSONObject warning fixes
+cl-0013,commit_hash-PR/commit associated with #860  |  | Java 21-related API Javadocs,"APIs were missing documentation associated with Java 21 support.
+
+Documentation completeness change: adds Javadocs that were previously absent. The repository's 2024 release history explicitly identifies #860 as “Added missing Javadocs for Java 21.”",Missing Javadocs were added.
+cl-0014,Commit_hash - PR/commit associated with #1029  |  | External Javadoc / project documentation,"Project did not contain the new external-hosted-Javadoc badge.
+
+Documentation discoverability change. It makes the project's externally hosted API documentation easier for users to find.",External hosted Javadoc badge added.
+cl-0015,Commit_hash - 3665aad |  | External Javadoc / project documentation,"Project did not contain the new external-hosted-Javadoc badge.
+
+Documentation discoverability change. It makes the project's externally hosted API documentation easier for users to find.",External hosted Javadoc badge added.
+cl-0016,Commit_hash - 24bba97 |  | Release documentation/build files,"Documentation/build information before the Dec. 2025 release update. 
+
+Release-documentation maintenance. The commit is described as “update docs and builds for next release.”",Documentation and build information updated for the next release.
+cl-0017,docs/RELEASES.md,"Earlier release history without the 2026 release entries
+
+Changelog/documentation update that records new JSON-java releases and summarizes their purposes.",Release history includes 20260522 and 20260719 entries.;
+cl-0018,JSONArray class Javadoc,"Documentation describes the parser as accepting comma elision and inserting null.
+
+Interesting documentation-vs-behavior consistency event: issue #1033 reports that the documented lenient parsing behavior did not match the actual behavior in affected releases.",Documentation still states this behavior while a reported version behaved differently.
+cl-0019,Precision.round(...),"Documentation did not fully explain the potential inaccuracy involved in decimal-value representation when converting to and from a double. 
+
+Documentation clarification. The 1.2 release notes explicitly identify NUMBERS-199 as a change to document this limitation of Precision.round.",Documentation was expanded to describe inaccurate decimal-value representation during double conversion.
+cl-0020,Javadoc affected by reported incorrect documentation,"Documentation did not fully explain the potential inaccuracy involved in decimal-value representation when converting to and from a double. 
+
+Documentation clarification. The 1.2 release notes explicitly identify NUMBERS-199 as a change to document this limitation of Precision.round.",Documentation was expanded to describe inaccurate decimal-value representation during double conversion.
+cl-0021,Fraction.compareTo(...),"Documentation/source associated with the previous comparison behavior.
+
+Potential behavior/documentation event. NUMBERS-207 fixed compareTo for Fraction and BigFraction when both values are negative. This should only be classified as a Javadoc event if its actual diff also modifies documentation",Documentation/source corresponds to corrected comparison behavior for negative fractions.
+cl-0022,BigFraction.compareTo(...),"Documentation/source associated with the previous negative-value comparison behavior.
+
+Same NUMBERS-207 issue as above, but for BigFraction. Keep this as a separate event only if the commit contains a distinct documentation change for this class.",Documentation/source associated with corrected negative-value comparison behavior.
+cl-0023,Precision.compareTo(...),"Earlier API documentation/behavior concerning comparisons involving NaN
+
+Behavior/API clarification candidate. Commons Numbers 1.0 records that Precision.compareTo was changed to handle NaN properly for consistent sorting. We need the diff to determine whether Javadoc itself changed.",Documentation/API corresponds to comparison behavior that handles NaN consistently for sorting.
+cl-0024,ContinuedFraction,"Earlier documentation/API allowed an epsilon value without the subsequently introduced minimum-bound behavior
+
+Edge-case documentation candidate. NUMBERS-173 introduced a minimum epsilon bound to prevent an infinite loop when epsilon is zero. Check the commit for associated Javadoc changes before treating this as a documentation event.",Documentation/API corresponds to a minimum bound on relative-error epsilon.
+cl-0025,FactorialDouble,"Documentation represented FactorialDouble as a normal supported class with its previous caching functionality.
+
+API/deprecation documentation change. NUMBERS-178 deprecated FactorialDouble and removed obsolete caching functionality. A deprecation normally has corresponding API documentation, but its exact Javadoc needs to come from the diff",Documentation marks the class deprecated as functionality was replaced/changed.
+cl-0026,InverseErfc,"Documentation described the previously supported input range.
+
+API-range documentation candidate. NUMBERS-171 expanded the supported range, lowering the minimum supported value from 2^-53 to the minimum double value.","Documentation/API corresponds to support for the full [0, 2] range."
+cl-0027,BrentSolver,"Earlier documentation/source associated with constructing an initial value between lower and upper bounds.
+
+Numerical edge-case candidate. The release notes explicitly identify this overflow fix. Current BrentSolver also has substantial API Javadoc, making its history worth checking for documentation changes.",Documentation/source corresponds to the implementation that avoids overflow when constructing that value.
+cl-0028,ArithmeticUtils,"Earlier documentation/source associated with GCD and unsigned arithmetic operations.
+
+Performance/API documentation candidate. Commons Numbers 1.2 records improvements to GCD for long values and to remainderUnsigned/divideUnsigned. The current class contains extensive method Javadocs, so the corresponding diffs are worth checking",Documentation/source associated with the optimized implementations.
